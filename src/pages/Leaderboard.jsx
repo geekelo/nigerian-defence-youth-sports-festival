@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Link, useOutletContext } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import {
   RESULTS,
   buildStandings,
@@ -11,8 +11,8 @@ import {
 } from '../data/competition.js'
 import { SPORTS } from '../data/event.js'
 import { EVENT } from '../brand.js'
-import { BrandLogos } from '../components/BrandLogos.jsx'
-import { icon } from '../icons.jsx'
+import PageHero from '../components/PageHero.jsx'
+import { icon, sportIcon } from '../icons.jsx'
 
 const GENDER_TABS = [
   { id: 'overall', label: 'Overall' },
@@ -35,7 +35,6 @@ function collectResults(sportId, genderId) {
 }
 
 function Leaderboard() {
-  const { openNav } = useOutletContext()
   const [sport, setSport] = useState('basketball')
   const [tab, setTab] = useState('overall')
 
@@ -47,51 +46,40 @@ function Leaderboard() {
 
   return (
     <div className="reg-main">
-      <header className="reg-topbar">
-        <div className="reg-topbar-lead">
-          <BrandLogos />
-          <div className="reg-topbar-title">
-            <h1>LEADERBOARD</h1>
-            <p>
-              {EVENT.shortName} standings · {EVENT.dateRangeShort}
-            </p>
-          </div>
-        </div>
-        <button
-          className="reg-mobile-menu"
-          type="button"
-          onClick={openNav}
-          aria-label="Toggle menu"
-        >
-          {icon.menu}
-        </button>
-      </header>
+      <PageHero
+        badge={EVENT.dateRangeShort}
+        title="Leaderboard"
+        subtitle={`${EVENT.shortName} standings · ${EVENT.dateRangeShort}`}
+      />
 
       <div className="reg-body lb-body">
-        <div className="reg-type-toggle lb-tabs">
-          {SPORTS.map((s) => (
-            <button
-              key={s.id}
-              type="button"
-              className={`reg-type-btn${sport === s.id ? ' active' : ''}`}
-              onClick={() => setSport(s.id)}
-            >
-              {s.name}
-            </button>
-          ))}
-        </div>
+        <div className="filter-bar">
+          <div className="pill-group">
+            {SPORTS.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                className={`pill${sport === s.id ? ' active' : ''}`}
+                onClick={() => setSport(s.id)}
+              >
+                {sportIcon[s.id]}
+                {s.name}
+              </button>
+            ))}
+          </div>
 
-        <div className="reg-type-toggle lb-tabs">
-          {GENDER_TABS.map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              className={`reg-type-btn${tab === t.id ? ' active' : ''}`}
-              onClick={() => setTab(t.id)}
-            >
-              {t.label}
-            </button>
-          ))}
+          <div className="pill-group">
+            {GENDER_TABS.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                className={`pill${tab === t.id ? ' active' : ''}`}
+                onClick={() => setTab(t.id)}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         <section className="reg-card regs-card">

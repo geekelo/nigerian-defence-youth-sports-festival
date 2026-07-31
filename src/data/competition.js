@@ -159,3 +159,17 @@ export function buildStandings(resultRows = []) {
 export function fixturesForSport(sportId) {
   return FIXTURES.filter((f) => f.sport === sportId)
 }
+
+/** '1200–1330' -> '12:00 PM'. Non-numeric labels pass through unchanged. */
+export function formatFixtureTime(time) {
+  const start = String(time || '').split(/[–-]/)[0].trim()
+  if (!/^\d{3,4}$/.test(start)) return time
+
+  const padded = start.padStart(4, '0')
+  const hours24 = Number(padded.slice(0, 2))
+  const minutes = padded.slice(2)
+  const suffix = hours24 >= 12 ? 'PM' : 'AM'
+  const hours12 = hours24 % 12 === 0 ? 12 : hours24 % 12
+
+  return `${String(hours12).padStart(2, '0')}:${minutes} ${suffix}`
+}

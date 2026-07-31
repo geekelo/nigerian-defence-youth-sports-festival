@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
-import { useOutletContext } from 'react-router-dom'
+
 import { EVENT, logos } from '../brand.js'
-import { BrandLogos } from '../components/BrandLogos.jsx'
-import { icon } from '../icons.jsx'
+import PageHero from '../components/PageHero.jsx'
 
 const EVENT_DATE = new Date(EVENT.startDate)
 
@@ -19,7 +18,6 @@ function getRemaining() {
 }
 
 function EventCountdown({ title = 'Home', subtitle = 'Countdown to the main event' }) {
-  const { openNav } = useOutletContext()
   const [time, setTime] = useState(getRemaining)
 
   useEffect(() => {
@@ -36,23 +34,11 @@ function EventCountdown({ title = 'Home', subtitle = 'Countdown to the main even
 
   return (
     <div className="reg-main">
-      <header className="reg-topbar">
-        <div className="reg-topbar-lead">
-          <BrandLogos />
-          <div className="reg-topbar-title">
-            <h1>{title.toUpperCase()}</h1>
-            <p>{subtitle}</p>
-          </div>
-        </div>
-        <button
-          className="reg-mobile-menu"
-          type="button"
-          onClick={openNav}
-          aria-label="Toggle menu"
-        >
-          {icon.menu}
-        </button>
-      </header>
+      <PageHero
+        badge={EVENT.dateRangeShort}
+        title={title}
+        subtitle={subtitle}
+      />
 
       <div className="reg-body cd-body">
         <div className="cd">

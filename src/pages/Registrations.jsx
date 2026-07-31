@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
-import { useOutletContext } from 'react-router-dom'
+
 import { useAuth } from '../auth/AuthContext.jsx'
 import LoginForm from '../components/LoginForm.jsx'
-import { BrandLogos } from '../components/BrandLogos.jsx'
 import {
   fetchGuestRegistrations,
   fetchTeamRegistrations,
 } from '../api/registrations.js'
 import { sportById, teamDisplayName } from '../data/event.js'
+import { EVENT } from '../brand.js'
+import PageHero from '../components/PageHero.jsx'
 import { icon } from '../icons.jsx'
 
 function formatDate(value) {
@@ -41,7 +42,6 @@ function teamPlayers(team) {
 }
 
 function Registrations() {
-  const { openNav } = useOutletContext()
   const { isAuthenticated } = useAuth()
   const [tab, setTab] = useState('team')
 
@@ -103,27 +103,15 @@ function Registrations() {
 
   return (
     <div className="reg-main">
-      <header className="reg-topbar">
-        <div className="reg-topbar-lead">
-          <BrandLogos />
-          <div className="reg-topbar-title">
-            <h1>REGISTRATIONS</h1>
-            <p>
-              {isAuthenticated
-                ? 'View guest and team registrations'
-                : 'Sign in to view registrations'}
-            </p>
-          </div>
-        </div>
-        <button
-          className="reg-mobile-menu"
-          type="button"
-          onClick={openNav}
-          aria-label="Toggle menu"
-        >
-          {icon.menu}
-        </button>
-      </header>
+      <PageHero
+        badge={EVENT.dateRangeShort}
+        title="Registrations"
+        subtitle={
+          isAuthenticated
+            ? 'View guest and team registrations'
+            : 'Sign in to view registrations'
+        }
+      />
 
       <div className="reg-body">
         {!isAuthenticated ? (
@@ -135,17 +123,17 @@ function Registrations() {
           </div>
         ) : (
           <>
-            <div className="reg-type-toggle">
+            <div className="pill-group">
               <button
                 type="button"
-                className={`reg-type-btn${tab === 'team' ? ' active' : ''}`}
+                className={`pill${tab === 'team' ? ' active' : ''}`}
                 onClick={() => setTab('team')}
               >
                 {icon.teams} Teams ({loading ? '…' : teams.length})
               </button>
               <button
                 type="button"
-                className={`reg-type-btn${tab === 'guest' ? ' active' : ''}`}
+                className={`pill${tab === 'guest' ? ' active' : ''}`}
                 onClick={() => setTab('guest')}
               >
                 {icon.group} Guests ({loading ? '…' : guests.length})

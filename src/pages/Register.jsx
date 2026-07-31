@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { useNavigate, useOutletContext } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import {
   createGuestRegistration,
   createTeamRegistration,
@@ -11,7 +11,8 @@ import {
   TOTAL_TEAM_SLOTS,
   rosterSizeForSport,
 } from '../data/event.js'
-import { BrandLogos } from '../components/BrandLogos.jsx'
+import { EVENT } from '../brand.js'
+import PageHero from '../components/PageHero.jsx'
 import { icon } from '../icons.jsx'
 
 const COUNTRIES = [
@@ -24,8 +25,6 @@ const RANKS = [
   'Col', 'Lt Col', 'Maj', 'Capt', 'Lt', 'AWIO', 'NWO', 'SSgt', 'Sgt',
   'Cpl', 'LCpl', 'Pte or equivalent', 'Prof', 'Dr', 'Mr', 'Mrs', 'Ms',
 ]
-
-const STEPS = ['Select Type', 'Fill Details', 'Review & Submit']
 
 const emptyGuest = {
   country: 'Nigeria',
@@ -76,7 +75,6 @@ function validateTeam(team) {
 
 function Register() {
   const navigate = useNavigate()
-  const { openNav } = useOutletContext()
   const [type, setType] = useState('team')
   const [submitting, setSubmitting] = useState(false)
   const [status, setStatus] = useState(null)
@@ -147,43 +145,13 @@ function Register() {
 
   return (
     <div className="reg-main">
-      <header className="reg-topbar">
-        <div className="reg-topbar-lead">
-          <BrandLogos />
-          <div className="reg-topbar-title">
-            <h1>REGISTRATION</h1>
-            <p>Choose a registration type and complete the form</p>
-          </div>
-        </div>
-
-        <button
-          className="reg-mobile-menu"
-          type="button"
-          onClick={openNav}
-          aria-label="Toggle menu"
-        >
-          {icon.menu}
-        </button>
-
-        <div className="reg-steps">
-          {STEPS.map((label, i) => (
-            <div className="reg-step-wrap" key={label} style={{ display: 'flex', alignItems: 'center' }}>
-              <div className={`reg-step${i === 0 ? ' active' : ''}`}>
-                <span className="reg-step-dot">{i + 1}</span>
-                <span className="reg-step-label">{label}</span>
-              </div>
-              {i < STEPS.length - 1 && <span className="reg-step-line" />}
-            </div>
-          ))}
-        </div>
-      </header>
+      <PageHero
+        badge={EVENT.dateRangeShort}
+        title="Registration"
+        subtitle={`Register a barracks team (male or female) for basketball, football or volleyball — ${TOTAL_TEAM_SLOTS} team slots across 8 barracks.`}
+      />
 
       <div className="reg-body">
-        <p className="reg-hint">
-          Register a barracks team (male or female) for basketball, football or volleyball
-          — {TOTAL_TEAM_SLOTS} team slots across 8 barracks.
-        </p>
-
         <div className="reg-type-toggle">
           <button
             type="button"

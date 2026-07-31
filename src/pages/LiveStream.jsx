@@ -1,6 +1,6 @@
-import { useOutletContext } from 'react-router-dom'
+
 import { EVENT } from '../brand.js'
-import { BrandLogos } from '../components/BrandLogos.jsx'
+import PageHero from '../components/PageHero.jsx'
 import { icon } from '../icons.jsx'
 
 /** Placeholder sessions — replace YouTube IDs when streams go live */
@@ -31,27 +31,14 @@ function sessionWatch(id) {
 }
 
 function LiveStream() {
-  const { openNav } = useOutletContext()
 
   return (
     <div className="reg-main">
-      <header className="reg-topbar">
-        <div className="reg-topbar-lead">
-          <BrandLogos />
-          <div className="reg-topbar-title">
-            <h1>LIVE STREAM</h1>
-            <p>Watch {EVENT.shortName} live</p>
-          </div>
-        </div>
-        <button
-          className="reg-mobile-menu"
-          type="button"
-          onClick={openNav}
-          aria-label="Toggle menu"
-        >
-          {icon.menu}
-        </button>
-      </header>
+      <PageHero
+        badge={EVENT.dateRangeShort}
+        title="Live Stream"
+        subtitle={`Watch ${EVENT.shortName} live`}
+      />
 
       <div className="reg-body live-body">
         {SESSIONS.map((session, index) => (

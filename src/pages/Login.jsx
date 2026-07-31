@@ -1,33 +1,21 @@
-import { Link, useNavigate, useOutletContext } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext.jsx'
 import LoginForm from '../components/LoginForm.jsx'
-import { BrandLogos } from '../components/BrandLogos.jsx'
+import PageHero from '../components/PageHero.jsx'
+import { EVENT } from '../brand.js'
 import { icon } from '../icons.jsx'
 
 function Login() {
   const navigate = useNavigate()
-  const { openNav } = useOutletContext()
   const { isAuthenticated, user } = useAuth()
 
   return (
     <div className="reg-main">
-      <header className="reg-topbar">
-        <div className="reg-topbar-lead">
-          <BrandLogos />
-          <div className="reg-topbar-title">
-            <h1>LOGIN</h1>
-            <p>Sign in to manage the championship</p>
-          </div>
-        </div>
-        <button
-          className="reg-mobile-menu"
-          type="button"
-          onClick={openNav}
-          aria-label="Toggle menu"
-        >
-          {icon.menu}
-        </button>
-      </header>
+      <PageHero
+        badge={EVENT.dateRangeShort}
+        title="Login"
+        subtitle="Sign in to manage the championship"
+      />
 
       <div className="reg-body">
         <div className="login-wrap">

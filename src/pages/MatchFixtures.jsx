@@ -1,25 +1,53 @@
 import { useMemo, useState } from 'react'
-import { useOutletContext } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import {
   TEAMS,
   FIXTURES,
-  fixturesForSport,
   teamName,
   teamShort,
   sportName,
+  formatFixtureTime,
 } from '../data/competition.js'
-import { SPORTS } from '../data/event.js'
+import { EVENT_DAYS, SPORTS, venueForSport } from '../data/event.js'
 import { EVENT } from '../brand.js'
-import { BrandLogos } from '../components/BrandLogos.jsx'
-import { icon } from '../icons.jsx'
+import PageHero from '../components/PageHero.jsx'
+import { icon, sportIcon } from '../icons.jsx'
+
+/** Distinct badge colours so each barracks reads differently on the cards. */
+const BADGE_COLORS = {
+  MAM: 'linear-gradient(160deg, #7c3aed, #4c1d95)',
+  MOG: 'linear-gradient(160deg, #0ea5e9, #075985)',
+  NVY: 'linear-gradient(160deg, #10b981, #065f46)',
+  NNB: 'linear-gradient(160deg, #2563eb, #1e3a8a)',
+  AZA: 'linear-gradient(160deg, #f59e0b, #b45309)',
+  NBC: 'linear-gradient(160deg, #ef4444, #991b1b)',
+  SHA: 'linear-gradient(160deg, #14b8a6, #115e59)',
+  LUN: 'linear-gradient(160deg, #ec4899, #9d174d)',
+}
+
+function TeamBadge({ code }) {
+  return (
+    <span
+      className="fx-team-badge"
+      style={{ background: BADGE_COLORS[code] || 'linear-gradient(160deg, #475569, #1e293b)' }}
+    >
+      {code}
+    </span>
+  )
+}
 
 function MatchFixtures() {
-  const { openNav } = useOutletContext()
   const [sport, setSport] = useState('all')
+  const [day, setDay] = useState('all')
 
   const fixtures = useMemo(
-    () => (sport === 'all' ? FIXTURES : fixturesForSport(sport)),
-    [sport],
+    () =>
+      FIXTURES.filter(
+        (f) =>
+          (sport === 'all' || f.sport === sport) &&
+          (day === 'all' || f.day === day),
+      ),
+    [sport, day],
   )
 
   const byDay = useMemo(() => {
@@ -34,108 +62,116 @@ function MatchFixtures() {
 
   return (
     <div className="reg-main">
-      <header className="reg-topbar">
-        <div className="reg-topbar-lead">
-          <BrandLogos />
-          <div className="reg-topbar-title">
-            <h1>MATCH FIXTURES</h1>
-            <p>
-              {EVENT.shortName} · {EVENT.dateRangeShort}
-            </p>
-          </div>
-        </div>
-        <button
-          className="reg-mobile-menu"
-          type="button"
-          onClick={openNav}
-          aria-label="Toggle menu"
-        >
-          {icon.menu}
-        </button>
-      </header>
+      <PageHero
+        badge={EVENT.dateRangeShort}
+        title="Match Fixtures"
+        subtitle={`${EVENT.shortName} · ${EVENT.dateRangeShort}`}
+      />
 
       <div className="reg-body fx-body">
-        <section className="reg-card fx-hero">
-          <div className="reg-card-head">
-            <span className="reg-card-icon blue">{icon.matches}</span>
-            <div>
-              <h2>8 BARRACKS · 3 SPORTS · M/F</h2>
-              <p>
-                {EVENT.venues.join(' · ')}
-              </p>
-            </div>
-          </div>
-
-          <div className="fx-teams">
-            {TEAMS.map((team) => (
-              <div className="fx-team" key={team.code}>
-                <span className="fx-code">{team.code}</span>
-                <span className="fx-name">{team.name}</span>
-              </div>
+        <div className="filter-bar">
+          <div className="pill-group">
+            <button
+              type="button"
+              className={`pill${day === 'all' ? ' active' : ''}`}
+              onClick={() => setDay('all')}
+            >
+              {icon.schedule}
+              All Days
+            </button>
+            {EVENT_DAYS.map((d) => (
+              <button
+                key={d.id}
+                type="button"
+                className={`pill${day === d.id ? ' active' : ''}`}
+                onClick={() => setDay(d.id)}
+              >
+                {d.label}
+              </button>
             ))}
           </div>
-        </section>
 
-        <div className="reg-type-toggle lb-tabs">
-          <button
-            type="button"
-            className={`reg-type-btn${sport === 'all' ? ' active' : ''}`}
-            onClick={() => setSport('all')}
-          >
-            All Sports
-          </button>
-          {SPORTS.map((s) => (
+          <div className="pill-group">
             <button
-              key={s.id}
               type="button"
-              className={`reg-type-btn${sport === s.id ? ' active' : ''}`}
-              onClick={() => setSport(s.id)}
+              className={`pill${sport === 'all' ? ' active' : ''}`}
+              onClick={() => setSport('all')}
             >
-              {s.name}
+              {icon.grid}
+              All Sports
             </button>
-          ))}
+            {SPORTS.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                className={`pill${sport === s.id ? ' active' : ''}`}
+                onClick={() => setSport(s.id)}
+              >
+                {sportIcon[s.id]}
+                {s.name}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {byDay.map(([dayLabel, rows]) => (
-          <section className="reg-card" key={dayLabel}>
-            <div className="reg-card-head">
-              <span className="reg-card-icon green">{icon.schedule}</span>
-              <div>
-                <h2>{dayLabel.toUpperCase()}</h2>
-                <p>{rows.length} fixtures · Male &amp; Female</p>
+        {byDay.length === 0 ? (
+          <p className="regs-empty">No fixtures match the selected filters.</p>
+        ) : (
+          byDay.map(([dayLabel, rows]) => (
+            <div key={dayLabel}>
+              <div className="fx-day-heading">
+                <h2>{dayLabel}</h2>
+                <span>{rows.length} fixtures · Male &amp; Female</span>
+              </div>
+
+              <div className="fx-grid" style={{ marginTop: 14 }}>
+                {rows.map((f, i) => (
+                  <article
+                    className="fx-card"
+                    key={`${f.home}-${f.away}-${f.sport}-${f.time}-${i}`}
+                  >
+                    <div className="fx-card-top">
+                      <span className="fx-tag time">
+                        {icon.clock}
+                        {formatFixtureTime(f.time)}
+                      </span>
+                      <span className={`fx-tag ${f.sport}`}>
+                        {sportIcon[f.sport]}
+                        {sportName(f.sport)}
+                      </span>
+                    </div>
+
+                    <div className="fx-card-body">
+                      <TeamBadge code={f.home} />
+                      <span className="fx-team-name">{teamShort(f.home)}</span>
+                      <span className="fx-vs">VS</span>
+                      <span className="fx-team-name right">{teamShort(f.away)}</span>
+                      <TeamBadge code={f.away} />
+                    </div>
+
+                    <div className="fx-card-foot">
+                      {icon.pin}
+                      {f.note || venueForSport(f.sport)}
+                    </div>
+                  </article>
+                ))}
               </div>
             </div>
+          ))
+        )}
 
-            <ol className="fx-list">
-              {rows.map((f, i) => (
-                <li className="fx-bout" key={`${f.home}-${f.away}-${f.sport}-${f.time}-${i}`}>
-                  <span className="fx-round">
-                    {f.time} · {sportName(f.sport)} (M/F)
-                    {f.note ? ` · ${f.note}` : ''}
-                  </span>
-                  <div className="fx-vs">
-                    <span className="fx-side">
-                      <span className="fx-code sm">{f.home}</span>
-                      {teamShort(f.home)}
-                    </span>
-                    <span className="fx-vs-label">vs</span>
-                    <span className="fx-side">
-                      <span className="fx-code sm">{f.away}</span>
-                      {teamShort(f.away)}
-                    </span>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </section>
-        ))}
+        <div className="section-cta">
+          <Link className="reg-btn" to="/schedule">
+            {icon.schedule} View Full Schedule {icon.chevron}
+          </Link>
+        </div>
 
         <section className="reg-card">
           <div className="reg-card-head">
             <span className="reg-card-icon blue">{icon.info}</span>
             <div>
-              <h2>TEAM KEY</h2>
-              <p>Barracks codes used in fixtures</p>
+              <h2>Team Key</h2>
+              <p>Barracks codes used in fixtures · {EVENT.venues.join(' · ')}</p>
             </div>
           </div>
           <ul className="fx-key">

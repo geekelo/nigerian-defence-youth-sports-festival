@@ -1,12 +1,11 @@
 import { useMemo, useState } from 'react'
-import { useOutletContext } from 'react-router-dom'
+
 import { SCHEDULE, SCHEDULE_DAYS } from '../data/schedule.js'
 import { EVENT } from '../brand.js'
-import { BrandLogos } from '../components/BrandLogos.jsx'
+import PageHero from '../components/PageHero.jsx'
 import { icon } from '../icons.jsx'
 
 function Schedule() {
-  const { openNav } = useOutletContext()
   const [day, setDay] = useState('all')
 
   const items = useMemo(
@@ -16,23 +15,11 @@ function Schedule() {
 
   return (
     <div className="reg-main">
-      <header className="reg-topbar">
-        <div className="reg-topbar-lead">
-          <BrandLogos />
-          <div className="reg-topbar-title">
-            <h1>SCHEDULE</h1>
-            <p>{EVENT.name} programme</p>
-          </div>
-        </div>
-        <button
-          className="reg-mobile-menu"
-          type="button"
-          onClick={openNav}
-          aria-label="Toggle menu"
-        >
-          {icon.menu}
-        </button>
-      </header>
+      <PageHero
+        badge={EVENT.dateRangeShort}
+        title="Schedule"
+        subtitle={`${EVENT.name} programme of events`}
+      />
 
       <div className="reg-body">
         <div className="sched-day-toggle" role="tablist" aria-label="Filter by day">
