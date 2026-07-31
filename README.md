@@ -50,7 +50,7 @@ Roster sizes: Basketball 12 · Football 18 · Volleyball 12.
 
 | Route | Purpose |
 |-------|---------|
-| `/register` | Guest & team registration |
+| `/register` | Team registration |
 | `/registrations` | Admin list (login required) |
 | `/schedule` | Programme of events |
 | `/match-fixtures` | Barracks fixtures by sport |

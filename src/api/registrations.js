@@ -2,26 +2,11 @@ import { apiGet, apiPost } from './client.js'
 import { getStoredToken } from './auth.js'
 import { barrackByCode, rosterSizeForSport, sportById } from '../data/event.js'
 
-const GUEST_PATH = '/api/v1/dhqysc_guest_registrations'
 const TEAM_PATH = '/api/v1/dhqysc_team_registrations'
 
 function titleCase(value) {
   if (!value) return value
   return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase()
-}
-
-export function createGuestRegistration(guest) {
-  return apiPost(GUEST_PATH, {
-    dhqysc_guest_registration: {
-      country: guest.country,
-      full_name: guest.name,
-      rank_title: guest.rank,
-      organization_unit: guest.org,
-      appointment: guest.appointment,
-      travel_mode: titleCase(guest.travel),
-      accommodation: guest.accommodation === 'yes',
-    },
-  })
 }
 
 export function createTeamRegistration(team) {
@@ -54,17 +39,6 @@ function normalizeList(data, keys = []) {
   }
   if (Array.isArray(data?.data)) return data.data
   return []
-}
-
-export async function fetchGuestRegistrations() {
-  const data = await apiGet(GUEST_PATH, {
-    token: getStoredToken(),
-  })
-  return normalizeList(data, [
-    'dhqysc_guest_registrations',
-    'guest_registrations',
-    'guests',
-  ])
 }
 
 export async function fetchTeamRegistrations() {
