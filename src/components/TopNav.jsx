@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext.jsx'
 import { EVENT, logos } from '../brand.js'
 import { icon } from '../icons.jsx'
@@ -39,7 +39,12 @@ function TopNav({ open = false, onToggle, onNavigate }) {
   return (
     <header className={`ysf-topnav${open ? ' open' : ''}`}>
       <div className="ysf-topnav-inner">
-        <div className="ysf-topnav-brand">
+        <Link
+          to="/register"
+          className="ysf-topnav-brand"
+          onClick={onNavigate}
+          aria-label="Go to registration home"
+        >
           <img className="ysf-topnav-mark" src={logos.defence} alt={logos.defenceAlt} />
           <img className="ysf-topnav-mark" src={logos.event} alt={logos.eventAlt} />
           <div className="ysf-topnav-brand-text">
@@ -53,7 +58,7 @@ function TopNav({ open = false, onToggle, onNavigate }) {
               {EVENT.dateRangeShort}
             </span>
           </div>
-        </div>
+        </Link>
 
         <nav className="ysf-topnav-links" aria-label="Main">
           {NAV.map(({ label, to, ic }) => (
