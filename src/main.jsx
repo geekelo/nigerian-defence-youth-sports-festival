@@ -17,10 +17,18 @@ const countdown = (title, subtitle) => (
   <EventCountdown title={title} subtitle={subtitle} />
 )
 
+function RootLayout() {
+  return (
+    <AuthProvider>
+      <DashboardLayout />
+    </AuthProvider>
+  )
+}
+
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <DashboardLayout />,
+    element: <RootLayout />,
     children: [
       { index: true, element: <Register /> },
       { path: 'register', element: <Register /> },
@@ -42,8 +50,6 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <AuthProvider>
-      <RouterProvider router={router} />
-    </AuthProvider>
+    <RouterProvider router={router} />
   </StrictMode>,
 )

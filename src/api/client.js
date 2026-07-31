@@ -125,12 +125,16 @@ export async function apiPost(path, body, { token } = {}) {
     throw new Error('Invalid email or password.')
   }
 
-  if (path === '/api/v1/guest_registrations') {
-    return localCreateGuest(body.guest_registration)
+  if (path === '/api/v1/dhqysc_guest_registrations') {
+    return localCreateGuest(
+      body.dhqysc_guest_registration || body.guest_registration,
+    )
   }
 
-  if (path === '/api/v1/team_registrations') {
-    return localCreateTeam(body.team_registration)
+  if (path === '/api/v1/dhqysc_team_registrations') {
+    return localCreateTeam(
+      body.dhqysc_team_registration || body.team_registration,
+    )
   }
 
   throw new Error(`Unknown local API path: ${path}`)
@@ -139,11 +143,11 @@ export async function apiPost(path, body, { token } = {}) {
 export async function apiGet(path, { token } = {}) {
   if (USE_REMOTE) return remoteGet(path, { token })
 
-  if (path === '/api/v1/guest_registrations') {
+  if (path === '/api/v1/dhqysc_guest_registrations') {
     return readStore(STORE_KEYS.guests)
   }
 
-  if (path === '/api/v1/team_registrations') {
+  if (path === '/api/v1/dhqysc_team_registrations') {
     return readStore(STORE_KEYS.teams)
   }
 
