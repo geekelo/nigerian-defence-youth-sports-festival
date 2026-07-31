@@ -1,0 +1,440 @@
+import { useMemo, useState } from 'react'
+import { useNavigate, useOutletContext } from 'react-router-dom'
+import {
+  createGuestRegistration,
+  createTeamRegistration,
+} from '../api/registrations.js'
+import {
+  BARRACKS,
+  GENDERS,
+  SPORTS,
+  TOTAL_TEAM_SLOTS,
+  rosterSizeForSport,
+} from '../data/event.js'
+import { BrandLogos } from '../components/BrandLogos.jsx'
+import { icon } from '../icons.jsx'
+
+const COUNTRIES = [
+  'Nigeria', 'Ghana', 'Kenya', 'South Africa', 'Egypt', 'United States',
+  'United Kingdom', 'India', 'Brazil', 'France', 'Germany', 'Other',
+]
+
+const RANKS = [
+  'Gen or equivalent', 'Lt Gen or equivalent', 'Maj Gen', 'Brig Gen',
+  'Col', 'Lt Col', 'Maj', 'Capt', 'Lt', 'AWIO', 'NWO', 'SSgt', 'Sgt',
+  'Cpl', 'LCpl', 'Pte or equivalent', 'Prof', 'Dr', 'Mr', 'Mrs', 'Ms',
+]
+
+const STEPS = ['Select Type', 'Fill Details', 'Review & Submit']
+
+const emptyGuest = {
+  country: 'Nigeria',
+  name: '',
+  rank: '',
+  org: '',
+  appointment: '',
+  travel: 'road',
+  accommodation: 'yes',
+}
+
+function emptyTeam(sport = 'basketball') {
+  const size = rosterSizeForSport(sport)
+  return {
+    captain: '',
+    coach: '',
+    barracks: '',
+    sport,
+    gender: 'male',
+    players: Array(size).fill(''),
+    travel: 'road',
+    accommodation: 'yes',
+  }
+}
+
+function validateGuest(guest) {
+  if (!guest.country) return 'Country is required.'
+  if (!guest.name.trim()) return 'Full name is required.'
+  if (!guest.rank) return 'Rank / Title is required.'
+  if (!guest.org.trim()) return 'Organization / Unit is required.'
+  if (!guest.appointment.trim()) return 'Appointment / Position is required.'
+  return null
+}
+
+function validateTeam(team) {
+  if (!team.barracks) return 'Barracks is required.'
+  if (!team.sport) return 'Sport / Event is required.'
+  if (!team.gender) return 'Team gender is required.'
+  if (!team.captain.trim()) return 'Team captain is required.'
+  if (!team.coach.trim()) return 'Coach / Team leader is required.'
+  const size = rosterSizeForSport(team.sport)
+  if (team.players.length < size) return `Enter all ${size} player names.`
+  if (team.players.some((p) => !p.trim())) {
+    return `All ${size} player names are required.`
+  }
+  return null
+}
+
+function Register() {
+  const navigate = useNavigate()
+  const { openNav } = useOutletContext()
+  const [type, setType] = useState('team')
+  const [submitting, setSubmitting] = useState(false)
+  const [status, setStatus] = useState(null)
+
+  const [guest, setGuest] = useState(emptyGuest)
+  const [team, setTeam] = useState(() => emptyTeam())
+
+  const rosterSize = useMemo(
+    () => rosterSizeForSport(team.sport),
+    [team.sport],
+  )
+
+  const setG = (k, v) => setGuest((p) => ({ ...p, [k]: v }))
+  const setT = (k, v) => setTeam((p) => ({ ...p, [k]: v }))
+
+  const setSport = (sport) => {
+    const size = rosterSizeForSport(sport)
+    setTeam((p) => {
+      const players = Array(size)
+        .fill('')
+        .map((_, i) => p.players[i] || '')
+      return { ...p, sport, players }
+    })
+  }
+
+  const setPlayer = (i, v) =>
+    setTeam((p) => {
+      const players = [...p.players]
+      players[i] = v
+      return { ...p, players }
+    })
+
+  const handleSubmit = async () => {
+    setStatus(null)
+
+    const error = type === 'guest' ? validateGuest(guest) : validateTeam(team)
+    if (error) {
+      setStatus({ type: 'err', message: error })
+      return
+    }
+
+    setSubmitting(true)
+    try {
+      if (type === 'guest') {
+        await createGuestRegistration(guest)
+        setGuest(emptyGuest)
+      } else {
+        const barracks = BARRACKS.find((b) => b.code === team.barracks)
+        await createTeamRegistration({
+          ...team,
+          barracksName: barracks?.name || team.barracks,
+        })
+        setTeam(emptyTeam(team.sport))
+      }
+      setStatus({
+        type: 'ok',
+        message: 'Registration submitted successfully.',
+      })
+    } catch (err) {
+      setStatus({
+        type: 'err',
+        message: err.message || 'Unable to submit registration. Please try again.',
+      })
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  return (
+    <div className="reg-main">
+      <header className="reg-topbar">
+        <div className="reg-topbar-lead">
+          <BrandLogos />
+          <div className="reg-topbar-title">
+            <h1>REGISTRATION</h1>
+            <p>Choose a registration type and complete the form</p>
+          </div>
+        </div>
+
+        <button
+          className="reg-mobile-menu"
+          type="button"
+          onClick={openNav}
+          aria-label="Toggle menu"
+        >
+          {icon.menu}
+        </button>
+
+        <div className="reg-steps">
+          {STEPS.map((label, i) => (
+            <div className="reg-step-wrap" key={label} style={{ display: 'flex', alignItems: 'center' }}>
+              <div className={`reg-step${i === 0 ? ' active' : ''}`}>
+                <span className="reg-step-dot">{i + 1}</span>
+                <span className="reg-step-label">{label}</span>
+              </div>
+              {i < STEPS.length - 1 && <span className="reg-step-line" />}
+            </div>
+          ))}
+        </div>
+      </header>
+
+      <div className="reg-body">
+        <p className="reg-hint">
+          Register a barracks team (male or female) for basketball, football or volleyball
+          — {TOTAL_TEAM_SLOTS} team slots across 8 barracks.
+        </p>
+
+        <div className="reg-type-toggle">
+          <button
+            type="button"
+            className={`reg-type-btn${type === 'team' ? ' active' : ''}`}
+            onClick={() => {
+              setType('team')
+              setStatus(null)
+            }}
+          >
+            {icon.teams} Team Registration
+          </button>
+          <button
+            type="button"
+            className={`reg-type-btn${type === 'guest' ? ' active' : ''}`}
+            onClick={() => {
+              setType('guest')
+              setStatus(null)
+            }}
+          >
+            {icon.group} Guests &amp; Officials
+          </button>
+        </div>
+
+        <div className="reg-cards">
+          {type === 'guest' && (
+            <section className="reg-card card-guest">
+              <div className="reg-card-head">
+                <span className="reg-card-icon blue">{icon.user}</span>
+                <div>
+                  <h2>GUESTS &amp; OFFICIALS</h2>
+                  <p>Register as a guest or official</p>
+                </div>
+              </div>
+
+              <div className="reg-grid-2">
+                <div className="reg-field">
+                  <label>Country <span className="req">*</span></label>
+                  <select value={guest.country} onChange={(e) => setG('country', e.target.value)}>
+                    <option value="">Select Country</option>
+                    {COUNTRIES.map((c) => <option key={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div className="reg-field">
+                  <label>Name in Full <span className="req">*</span></label>
+                  <input
+                    placeholder="Enter full name"
+                    value={guest.name}
+                    onChange={(e) => setG('name', e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="reg-field">
+                <label>Rank / Title <span className="req">*</span></label>
+                <select value={guest.rank} onChange={(e) => setG('rank', e.target.value)}>
+                  <option value="">Select Rank or Title</option>
+                  {RANKS.map((r) => <option key={r}>{r}</option>)}
+                </select>
+                <p className="reg-help-text">
+                  Gen or equivalent, Lt Gen or equivalent, Maj Gen, Brig Gen, Col, Lt Col, Maj,
+                  Capt, Lt, AWIO, NWO, SSgt, Sgt, Cpl, LCpl, Pte or equivalent,
+                  Prof, Dr, Mr, Mrs, Ms...
+                </p>
+              </div>
+
+              <div className="reg-grid-2">
+                <div className="reg-field">
+                  <label>Organization / Unit <span className="req">*</span></label>
+                  <input
+                    placeholder="Enter organization or unit"
+                    value={guest.org}
+                    onChange={(e) => setG('org', e.target.value)}
+                  />
+                </div>
+                <div className="reg-field">
+                  <label>Appointment / Position <span className="req">*</span></label>
+                  <input
+                    placeholder="Enter appointment or position"
+                    value={guest.appointment}
+                    onChange={(e) => setG('appointment', e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="reg-grid-2">
+                <div className="reg-field">
+                  <label>Travel Mode <span className="req">*</span></label>
+                  <div className="reg-seg">
+                    <button type="button" className={guest.travel === 'air' ? 'active' : ''} onClick={() => setG('travel', 'air')}>{icon.plane} Air</button>
+                    <button type="button" className={guest.travel === 'road' ? 'active' : ''} onClick={() => setG('travel', 'road')}>{icon.car} Road</button>
+                  </div>
+                </div>
+                <div className="reg-field">
+                  <label>Accommodation <span className="req">*</span></label>
+                  <div className="reg-seg green">
+                    <button type="button" className={guest.accommodation === 'yes' ? 'active' : ''} onClick={() => setG('accommodation', 'yes')}>{icon.check} Yes</button>
+                    <button type="button" className={guest.accommodation === 'no' ? 'active' : ''} onClick={() => setG('accommodation', 'no')}>{icon.x} No</button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="reg-note">
+                {icon.info}
+                <span><strong>Note:</strong> Accommodation will be arranged based on availability.</span>
+              </div>
+            </section>
+          )}
+
+          {type === 'team' && (
+            <section className="reg-card card-team">
+              <div className="reg-card-head">
+                <span className="reg-card-icon green">{icon.teams}</span>
+                <div>
+                  <h2>TEAM REGISTRATION</h2>
+                  <p>One male and one female team per barracks, per sport</p>
+                </div>
+              </div>
+
+              <div className="reg-grid-2">
+                <div className="reg-field">
+                  <label>Barracks <span className="req">*</span></label>
+                  <select
+                    value={team.barracks}
+                    onChange={(e) => setT('barracks', e.target.value)}
+                  >
+                    <option value="">Select Barracks</option>
+                    {BARRACKS.map((b) => (
+                      <option key={b.code} value={b.code}>{b.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="reg-field">
+                  <label>Sport / Event <span className="req">*</span></label>
+                  <select
+                    value={team.sport}
+                    onChange={(e) => setSport(e.target.value)}
+                  >
+                    {SPORTS.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.name} ({s.rosterSize} players)
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="reg-field">
+                <label>Team Gender <span className="req">*</span></label>
+                <div className="reg-seg">
+                  {GENDERS.map((g) => (
+                    <button
+                      key={g.id}
+                      type="button"
+                      className={team.gender === g.id ? 'active' : ''}
+                      onClick={() => setT('gender', g.id)}
+                    >
+                      {icon.user} {g.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="reg-grid-2">
+                <div className="reg-field">
+                  <label>Team Captain <span className="req">*</span></label>
+                  <input
+                    placeholder="Enter team captain name"
+                    value={team.captain}
+                    onChange={(e) => setT('captain', e.target.value)}
+                  />
+                </div>
+                <div className="reg-field">
+                  <label>Coach / Team Leader <span className="req">*</span></label>
+                  <input
+                    placeholder="Enter coach or team leader name"
+                    value={team.coach}
+                    onChange={(e) => setT('coach', e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="reg-section-title">
+                TEAM PLAYERS ({rosterSize} REQUIRED)
+              </div>
+              <div className="reg-players">
+                {team.players.map((val, i) => (
+                  <div className="reg-player" key={i}>
+                    <span className="reg-player-no">{i + 1}</span>
+                    <span className="reg-player-lbl">
+                      Player {i + 1} <span className="req">*</span>
+                    </span>
+                    <input
+                      placeholder="Enter full name"
+                      value={val}
+                      onChange={(e) => setPlayer(i, e.target.value)}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <div className="reg-grid-2" style={{ marginTop: '18px' }}>
+                <div className="reg-field">
+                  <label>Travel Mode <span className="req">*</span></label>
+                  <div className="reg-seg">
+                    <button type="button" className={team.travel === 'air' ? 'active' : ''} onClick={() => setT('travel', 'air')}>{icon.plane} Air</button>
+                    <button type="button" className={team.travel === 'road' ? 'active' : ''} onClick={() => setT('travel', 'road')}>{icon.car} Road</button>
+                  </div>
+                </div>
+                <div className="reg-field">
+                  <label>Accommodation <span className="req">*</span></label>
+                  <div className="reg-seg green">
+                    <button type="button" className={team.accommodation === 'yes' ? 'active' : ''} onClick={() => setT('accommodation', 'yes')}>{icon.check} Yes</button>
+                    <button type="button" className={team.accommodation === 'no' ? 'active' : ''} onClick={() => setT('accommodation', 'no')}>{icon.x} No</button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="reg-note">
+                {icon.info}
+                <span>
+                  <strong>Note:</strong> Each barracks may register one male and one female
+                  team for each of basketball, football and volleyball ({TOTAL_TEAM_SLOTS} teams total).
+                </span>
+              </div>
+            </section>
+          )}
+        </div>
+      </div>
+
+      <footer className="reg-footer">
+        {status && (
+          <p className={`reg-status ${status.type === 'ok' ? 'ok' : 'err'}`}>
+            {status.message}
+          </p>
+        )}
+        <div className="reg-footer-actions">
+          <button className="reg-btn ghost" type="button" onClick={() => navigate('/')}>
+            {icon.x} Cancel
+          </button>
+          <button
+            className="reg-btn primary"
+            type="button"
+            onClick={handleSubmit}
+            disabled={submitting}
+          >
+            {submitting ? 'Submitting…' : 'Submit'} {icon.arrow}
+          </button>
+        </div>
+      </footer>
+    </div>
+  )
+}
+
+export default Register

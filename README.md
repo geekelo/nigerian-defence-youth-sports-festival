@@ -1,17 +1,55 @@
-# React + Vite
+# CDS Abuja Military Barracks Youths Sports Championship 2026
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Registration and event portal for the Defence Headquarters youth sports festival.
 
-Currently, two official plugins are available:
+## Event
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Dates:** 3–7 August 2026
+- **Venues:** Mogadishu Cantonment Sports Complex · Aguiyi Ironsi Sports Complex
+- **Sports:** Basketball, Football, Volleyball
+- **Barracks:** 8 participating barracks
+- **Teams:** 2 per barracks per sport (male + female) → **48 team slots**
 
-## React Compiler
+## Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+React 19 + Vite 8 + React Router. Registrations and admin login use **localStorage** by default so the app runs without a backend. Point `VITE_API_BASE` at a Rails API when ready.
 
-## Expanding the ESLint configuration
+## Run
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-# nigerian-defence-youth-sports-festival
+```bash
+npm install
+npm run dev
+```
+
+## Admin login (local mode)
+
+- Email: `admin@ysf.org.ng`
+- Password: `password123`
+
+## Team registration
+
+Each submission is one team identified by:
+
+1. Barracks (dropdown of 8)
+2. Sport (basketball / football / volleyball)
+3. Gender (male / female)
+4. Captain, coach, and full roster (12 / 18 / 12 players by sport)
+
+Duplicate barracks + sport + gender combinations are rejected.
+
+## Pages
+
+| Route | Purpose |
+|-------|---------|
+| `/register` | Guest & team registration |
+| `/registrations` | Admin list (login required) |
+| `/schedule` | Programme of events |
+| `/match-fixtures` | Barracks fixtures by sport |
+| `/leaderboard` | Standings by sport / gender |
+| `/live` | Live stream placeholders |
+
+## Remote API
+
+```bash
+VITE_API_BASE=https://your-api.example.com npm run dev
+```

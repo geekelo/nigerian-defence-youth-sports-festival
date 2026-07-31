@@ -1,0 +1,206 @@
+import { useMemo, useState } from 'react'
+import { Link, useOutletContext } from 'react-router-dom'
+import {
+  RESULTS,
+  buildStandings,
+  teamShort,
+  resultSides,
+  resultKey,
+  resultWinner,
+  sportName,
+} from '../data/competition.js'
+import { SPORTS } from '../data/event.js'
+import { EVENT } from '../brand.js'
+import { BrandLogos } from '../components/BrandLogos.jsx'
+import { icon } from '../icons.jsx'
+
+const GENDER_TABS = [
+  { id: 'overall', label: 'Overall' },
+  { id: 'female', label: 'Female' },
+  { id: 'male', label: 'Male' },
+]
+
+function rankClass(rank) {
+  if (rank === 1) return 'gold'
+  if (rank === 2) return 'silver'
+  if (rank === 3) return 'bronze'
+  return ''
+}
+
+function collectResults(sportId, genderId) {
+  const sport = RESULTS[sportId] || { male: [], female: [] }
+  if (genderId === 'male') return sport.male || []
+  if (genderId === 'female') return sport.female || []
+  return [...(sport.male || []), ...(sport.female || [])]
+}
+
+function Leaderboard() {
+  const { openNav } = useOutletContext()
+  const [sport, setSport] = useState('basketball')
+  const [tab, setTab] = useState('overall')
+
+  const rows = useMemo(
+    () => collectResults(sport, tab),
+    [sport, tab],
+  )
+  const standings = useMemo(() => buildStandings(rows), [rows])
+
+  return (
+    <div className="reg-main">
+      <header className="reg-topbar">
+        <div className="reg-topbar-lead">
+          <BrandLogos />
+          <div className="reg-topbar-title">
+            <h1>LEADERBOARD</h1>
+            <p>
+              {EVENT.shortName} standings · {EVENT.dateRangeShort}
+            </p>
+          </div>
+        </div>
+        <button
+          className="reg-mobile-menu"
+          type="button"
+          onClick={openNav}
+          aria-label="Toggle menu"
+        >
+          {icon.menu}
+        </button>
+      </header>
+
+      <div className="reg-body lb-body">
+        <div className="reg-type-toggle lb-tabs">
+          {SPORTS.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              className={`reg-type-btn${sport === s.id ? ' active' : ''}`}
+              onClick={() => setSport(s.id)}
+            >
+              {s.name}
+            </button>
+          ))}
+        </div>
+
+        <div className="reg-type-toggle lb-tabs">
+          {GENDER_TABS.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              className={`reg-type-btn${tab === t.id ? ' active' : ''}`}
+              onClick={() => setTab(t.id)}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        <section className="reg-card regs-card">
+          <div className="reg-card-head">
+            <span className="reg-card-icon green">{icon.leaderboard}</span>
+            <div>
+              <h2>
+                {sportName(sport).toUpperCase()} ·{' '}
+                {tab === 'female'
+                  ? 'FEMALE'
+                  : tab === 'male'
+                    ? 'MALE'
+                    : 'OVERALL'}{' '}
+                STANDINGS
+              </h2>
+              <p>
+                Ranked by points, then goal/point difference ·{' '}
+                <Link to="/match-fixtures">View fixtures</Link>
+              </p>
+            </div>
+          </div>
+
+          {rows.length === 0 ? (
+            <p className="regs-empty">
+              Results for {sportName(sport)} ({tab}) will appear here once matches are recorded.
+            </p>
+          ) : (
+            <div className="regs-table-wrap">
+              <table className="regs-table lb-table">
+                <thead>
+                  <tr>
+                    <th>Rank</th>
+                    <th>Barracks</th>
+                    <th>P</th>
+                    <th>W</th>
+                    <th>D</th>
+                    <th>L</th>
+                    <th>PF</th>
+                    <th>PA</th>
+                    <th>Diff</th>
+                    <th>Pts</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {standings.map((row, i) => {
+                    const rank = i + 1
+                    return (
+                      <tr key={row.code} className={rankClass(rank)}>
+                        <td>
+                          <span className={`lb-rank ${rankClass(rank)}`}>{rank}</span>
+                        </td>
+                        <td>
+                          <span className="lb-team">
+                            <span className="fx-code sm">{row.code}</span>
+                            {row.short}
+                          </span>
+                        </td>
+                        <td>{row.played}</td>
+                        <td>{row.wins}</td>
+                        <td>{row.draws}</td>
+                        <td>{row.losses}</td>
+                        <td>{row.pointsFor}</td>
+                        <td>{row.pointsAgainst}</td>
+                        <td>{row.diff > 0 ? `+${row.diff}` : row.diff}</td>
+                        <td><strong>{row.points}</strong></td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {rows.length > 0 && (
+            <>
+              <div className="reg-section-title" style={{ marginTop: 24 }}>
+                RECENT RESULTS
+              </div>
+              <div className="fx-results">
+                {rows.map((r) => {
+                  const sides = resultSides(r.scores)
+                  if (!sides) return null
+                  const winner = resultWinner(r.scores)
+                  return (
+                    <div className="fx-result" key={resultKey(r, sport, tab)}>
+                      <div className="fx-result-weight">{r.label || sportName(sport)}</div>
+                      <div className="fx-result-score">
+                        <span className={`fx-side${winner === sides.left ? ' win' : ''}`}>
+                          <span className="fx-code sm">{sides.left}</span>
+                          {teamShort(sides.left)}
+                          <strong>{sides.leftScore}</strong>
+                        </span>
+                        <span className="fx-vs-label">–</span>
+                        <span className={`fx-side${winner === sides.right ? ' win' : ''}`}>
+                          <span className="fx-code sm">{sides.right}</span>
+                          {teamShort(sides.right)}
+                          <strong>{sides.rightScore}</strong>
+                        </span>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </>
+          )}
+        </section>
+      </div>
+    </div>
+  )
+}
+
+export default Leaderboard
