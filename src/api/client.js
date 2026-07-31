@@ -1,31 +1,10 @@
 /**
- * Local-first API client.
- * Set VITE_API_BASE to a remote Rails API when available; otherwise uses localStorage.
+ * API client for DHQYSC portal.
+ * Override with VITE_API_BASE if needed.
  */
-const REMOTE_BASE = import.meta.env.VITE_API_BASE || ''
-const USE_REMOTE = Boolean(REMOTE_BASE)
-
-const STORE_KEYS = {
-  guests: 'ysf_guest_registrations',
-  teams: 'ysf_team_registrations',
-}
-
-function readStore(key) {
-  try {
-    const raw = localStorage.getItem(key)
-    return raw ? JSON.parse(raw) : []
-  } catch {
-    return []
-  }
-}
-
-function writeStore(key, value) {
-  localStorage.setItem(key, JSON.stringify(value))
-}
-
-function uid(prefix) {
-  return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
-}
+const REMOTE_BASE =
+  import.meta.env.VITE_API_BASE ||
+  'https://naval-wrestle-pulse-api.onrender.com'
 
 async function parseResponse(response) {
   let data = null
@@ -56,7 +35,7 @@ function authHeaders(token) {
   return headers
 }
 
-async function remotePost(path, body, { token } = {}) {
+export async function apiPost(path, body, { token } = {}) {
   const response = await fetch(`${REMOTE_BASE}${path}`, {
     method: 'POST',
     headers: authHeaders(token),
@@ -65,7 +44,7 @@ async function remotePost(path, body, { token } = {}) {
   return parseResponse(response)
 }
 
-async function remoteGet(path, { token } = {}) {
+export async function apiGet(path, { token } = {}) {
   const response = await fetch(`${REMOTE_BASE}${path}`, {
     method: 'GET',
     headers: authHeaders(token),
@@ -73,87 +52,6 @@ async function remoteGet(path, { token } = {}) {
   return parseResponse(response)
 }
 
-/** Local guest create */
-function localCreateGuest(payload) {
-  const list = readStore(STORE_KEYS.guests)
-  const record = {
-    id: uid('guest'),
-    created_at: new Date().toISOString(),
-    ...payload,
-  }
-  list.unshift(record)
-  writeStore(STORE_KEYS.guests, list)
-  return record
-}
-
-/** Local team create with uniqueness on barracks+sport+gender */
-function localCreateTeam(payload) {
-  const list = readStore(STORE_KEYS.teams)
-  const duplicate = list.find(
-    (t) =>
-      t.barracks_code === payload.barracks_code &&
-      t.sport === payload.sport &&
-      t.gender === payload.gender,
-  )
-  if (duplicate) {
-    throw new Error(
-      'This barracks already has a registered team for that sport and gender.',
-    )
-  }
-  const record = {
-    id: uid('team'),
-    created_at: new Date().toISOString(),
-    ...payload,
-  }
-  list.unshift(record)
-  writeStore(STORE_KEYS.teams, list)
-  return record
-}
-
-export async function apiPost(path, body, { token } = {}) {
-  if (USE_REMOTE) return remotePost(path, body, { token })
-
-  if (path === '/api/v1/authentication') {
-    const email = body?.user?.email?.trim().toLowerCase()
-    const password = body?.user?.password
-    if (email === 'admin@ysf.org.ng' && password === 'password123') {
-      return {
-        token: `local_${uid('tok')}`,
-        user: { email, name: 'YSF Admin', role: 'admin' },
-      }
-    }
-    throw new Error('Invalid email or password.')
-  }
-
-  if (path === '/api/v1/dhqysc_guest_registrations') {
-    return localCreateGuest(
-      body.dhqysc_guest_registration || body.guest_registration,
-    )
-  }
-
-  if (path === '/api/v1/dhqysc_team_registrations') {
-    return localCreateTeam(
-      body.dhqysc_team_registration || body.team_registration,
-    )
-  }
-
-  throw new Error(`Unknown local API path: ${path}`)
-}
-
-export async function apiGet(path, { token } = {}) {
-  if (USE_REMOTE) return remoteGet(path, { token })
-
-  if (path === '/api/v1/dhqysc_guest_registrations') {
-    return readStore(STORE_KEYS.guests)
-  }
-
-  if (path === '/api/v1/dhqysc_team_registrations') {
-    return readStore(STORE_KEYS.teams)
-  }
-
-  throw new Error(`Unknown local API path: ${path}`)
-}
-
-export function isRemoteApi() {
-  return USE_REMOTE
+export function getApiBase() {
+  return REMOTE_BASE
 }

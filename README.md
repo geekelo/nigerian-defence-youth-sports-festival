@@ -12,7 +12,7 @@ Registration and event portal for the Defence Headquarters youth sports festival
 
 ## Stack
 
-React 19 + Vite 8 + React Router. Registrations and admin login use **localStorage** by default so the app runs without a backend. Point `VITE_API_BASE` at a Rails API when ready.
+React 19 + Vite 8 + React Router. Registrations talk to the Rails API at `https://naval-wrestle-pulse-api.onrender.com` (override with `VITE_API_BASE`).
 
 ## Run
 
@@ -21,21 +21,30 @@ npm install
 npm run dev
 ```
 
-## Admin login (local mode)
+## Admin login
 
-- Email: `admin@ysf.org.ng`
-- Password: `password123`
+Uses the API authentication endpoint. Seed credentials match the wrestling portal admin unless changed on the server.
 
 ## Team registration
 
-Each submission is one team identified by:
+Each submission posts to `POST /api/v1/dhqysc_team_registrations`:
 
-1. Barracks (dropdown of 8)
-2. Sport (basketball / football / volleyball)
-3. Gender (male / female)
-4. Captain, coach, and full roster (12 / 18 / 12 players by sport)
+```json
+{
+  "dhqysc_team_registration": {
+    "barracks": "Mogadishu Barracks",
+    "sport": "Football",
+    "team_gender": "Male",
+    "team_captain": "Jane Doe",
+    "coach": "John Coach",
+    "players": ["Player 1", "Player 2"],
+    "travel_mode": "Road",
+    "accommodation": true
+  }
+}
+```
 
-Duplicate barracks + sport + gender combinations are rejected.
+Roster sizes: Basketball 12 · Football 18 · Volleyball 12.
 
 ## Pages
 

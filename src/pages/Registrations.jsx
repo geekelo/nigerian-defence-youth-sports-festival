@@ -6,7 +6,7 @@ import {
   fetchGuestRegistrations,
   fetchTeamRegistrations,
 } from '../api/registrations.js'
-import { sportById, teamDisplayName } from '../data/event.js'
+import { teamDisplayName } from '../data/event.js'
 import { EVENT } from '../brand.js'
 import PageHero from '../components/PageHero.jsx'
 import { icon } from '../icons.jsx'
@@ -226,7 +226,6 @@ function Registrations() {
                     <div className="team-regs-list">
                       {teams.map((t, index) => {
                         const players = teamPlayers(t)
-                        const sport = sportById(t.sport)
                         return (
                           <article
                             className="team-reg-card"
@@ -237,14 +236,14 @@ function Registrations() {
                               <div className="team-reg-meta">
                                 <h3>
                                   {teamDisplayName({
-                                    barracks: t.barracks_code || t.barracks_name,
+                                    barracks: t.barracks,
                                     sport: t.sport,
-                                    gender: t.gender,
+                                    gender: t.team_gender || t.gender,
                                   })}
                                 </h3>
                                 <p>
                                   Captain: <strong>{t.team_captain || '—'}</strong>
-                                  {t.coach_name ? ` · Coach: ${t.coach_name}` : ''}
+                                  {t.coach ? ` · Coach: ${t.coach}` : ''}
                                 </p>
                               </div>
                             </div>
@@ -252,23 +251,23 @@ function Registrations() {
                             <div className="team-reg-stats">
                               <div>
                                 <span>Barracks</span>
-                                <strong>{t.barracks_name || t.organization_unit || '—'}</strong>
+                                <strong>{t.barracks || '—'}</strong>
                               </div>
                               <div>
                                 <span>Sport</span>
-                                <strong>{sport?.name || t.sport || '—'}</strong>
+                                <strong>{t.sport || '—'}</strong>
                               </div>
                               <div>
                                 <span>Gender</span>
-                                <strong className="caps">{t.gender || '—'}</strong>
+                                <strong>{t.team_gender || t.gender || '—'}</strong>
                               </div>
                               <div>
                                 <span>Players</span>
-                                <strong>{t.player_count ?? players.length}</strong>
+                                <strong>{players.length}</strong>
                               </div>
                               <div>
                                 <span>Travel</span>
-                                <strong className="caps">{t.travel_mode || '—'}</strong>
+                                <strong>{t.travel_mode || '—'}</strong>
                               </div>
                               <div>
                                 <span>Stay</span>

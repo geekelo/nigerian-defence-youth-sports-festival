@@ -67,8 +67,14 @@ export function teamSlotKey(barracks, sport, gender) {
 
 export function teamDisplayName({ barracks, sport, gender }) {
   const b = barrackByCode(barracks) || barrackByName(barracks)
-  const s = sportById(sport)
-  const g = GENDERS.find((x) => x.id === gender)
+  const s =
+    sportById(sport) ||
+    SPORTS.find((x) => x.name.toLowerCase() === String(sport || '').toLowerCase())
+  const g = GENDERS.find(
+    (x) =>
+      x.id === gender ||
+      x.name.toLowerCase() === String(gender || '').toLowerCase(),
+  )
   const barrackLabel = b?.short || barracks || 'Team'
   const sportLabel = s?.name || sport || ''
   const genderLabel = g?.name || gender || ''

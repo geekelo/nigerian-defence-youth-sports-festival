@@ -1,9 +1,14 @@
 import { apiGet, apiPost } from './client.js'
 import { getStoredToken } from './auth.js'
-import { rosterSizeForSport } from '../data/event.js'
+import { barrackByCode, rosterSizeForSport, sportById } from '../data/event.js'
 
 const GUEST_PATH = '/api/v1/dhqysc_guest_registrations'
 const TEAM_PATH = '/api/v1/dhqysc_team_registrations'
+
+function titleCase(value) {
+  if (!value) return value
+  return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase()
+}
 
 export function createGuestRegistration(guest) {
   return apiPost(GUEST_PATH, {
@@ -13,7 +18,7 @@ export function createGuestRegistration(guest) {
       rank_title: guest.rank,
       organization_unit: guest.org,
       appointment: guest.appointment,
-      travel_mode: guest.travel,
+      travel_mode: titleCase(guest.travel),
       accommodation: guest.accommodation === 'yes',
     },
   })
@@ -22,19 +27,21 @@ export function createGuestRegistration(guest) {
 export function createTeamRegistration(team) {
   const size = rosterSizeForSport(team.sport)
   const players = team.players.slice(0, size).map((name) => name.trim())
+  const barracks =
+    team.barracksName ||
+    barrackByCode(team.barracks)?.name ||
+    team.barracks
+  const sport = sportById(team.sport)?.name || titleCase(team.sport)
 
   return apiPost(TEAM_PATH, {
     dhqysc_team_registration: {
+      barracks,
+      sport,
+      team_gender: titleCase(team.gender),
       team_captain: team.captain.trim(),
-      coach_name: team.coach.trim(),
-      barracks_code: team.barracks,
-      barracks_name: team.barracksName,
-      sport: team.sport,
-      gender: team.gender,
-      organization_unit: team.barracksName,
-      player_count: players.length,
+      coach: team.coach.trim(),
       players,
-      travel_mode: team.travel,
+      travel_mode: titleCase(team.travel),
       accommodation: team.accommodation === 'yes',
     },
   })
@@ -69,4 +76,10 @@ export async function fetchTeamRegistrations() {
     'team_registrations',
     'teams',
   ])
+}
+
+export async function fetchTeamRegistration(id) {
+  return apiGet(`${TEAM_PATH}/${id}`, {
+    token: getStoredToken(),
+  })
 }
