@@ -1318,6 +1318,62 @@
   font-size: 13.5px;
 }
 
+/* ---------- 404 ---------- */
+.not-found-card {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  padding: 18px 8px;
+}
+
+.not-found-code {
+  font-size: 72px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -3px;
+  background: linear-gradient(180deg, #fff, #6f9dff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.not-found h2 {
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.not-found p {
+  max-width: 420px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.not-found code {
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--line);
+  color: #a8c6ff;
+  font-size: 12.5px;
+}
+
+.not-found-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 1024px) {
   .hero h1 {

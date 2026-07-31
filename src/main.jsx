@@ -12,6 +12,7 @@ import MatchFixtures from './pages/MatchFixtures.jsx'
 import Leaderboard from './pages/Leaderboard.jsx'
 import LiveStream from './pages/LiveStream.jsx'
 import EventCountdown from './pages/EventCountdown.jsx'
+import NotFound from './pages/NotFound.jsx'
 
 const countdown = (title, subtitle) => (
   <EventCountdown title={title} subtitle={subtitle} />
@@ -44,6 +45,7 @@ const router = createBrowserRouter([
       { path: 'schedule', element: <Schedule /> },
       { path: 'officials', element: countdown('Officials', 'Officials coming soon') },
       { path: 'messages', element: countdown('Messages', 'Messages coming soon') },
+      { path: '*', element: <NotFound /> },
     ],
   },
 ])
