@@ -38,13 +38,13 @@ Each submission posts to `POST /api/v1/dhqysc_team_registrations`:
     "team_captain": "Jane Doe",
     "coach": "John Coach",
     "players": ["Player 1", "Player 2"],
-    "travel_mode": "Road",
-    "accommodation": true
+    "travel_mode": "Not needed",
+    "accommodation": false
   }
 }
 ```
 
-Roster sizes: Basketball 12 · Football 18 · Volleyball 12.
+Travel and accommodation are fixed as not needed (hidden from the form). Roster sizes: Basketball 12 · Football 18 · Volleyball 12.
 
 ## Pages
 

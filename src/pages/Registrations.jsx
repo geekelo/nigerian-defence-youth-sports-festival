@@ -20,12 +20,6 @@ function formatDate(value) {
   }
 }
 
-function yesNo(value) {
-  if (value === true || value === 'yes' || value === 'true') return 'Yes'
-  if (value === false || value === 'no' || value === 'false') return 'No'
-  return value == null ? '—' : String(value)
-}
-
 function teamPlayers(team) {
   if (Array.isArray(team.players)) {
     return team.players
@@ -156,14 +150,6 @@ function Registrations() {
                         <div>
                           <span>Players</span>
                           <strong>{players.length}</strong>
-                        </div>
-                        <div>
-                          <span>Travel</span>
-                          <strong>{t.travel_mode || '—'}</strong>
-                        </div>
-                        <div>
-                          <span>Stay</span>
-                          <strong>{yesNo(t.accommodation)}</strong>
                         </div>
                         <div>
                           <span>Date</span>

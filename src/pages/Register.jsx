@@ -21,8 +21,6 @@ function emptyTeam(sport = 'basketball') {
     sport,
     gender: 'male',
     players: Array(size).fill(''),
-    travel: 'road',
-    accommodation: 'yes',
   }
 }
 
@@ -200,23 +198,6 @@ function Register() {
                   />
                 </div>
               ))}
-            </div>
-
-            <div className="reg-grid-2" style={{ marginTop: '18px' }}>
-              <div className="reg-field">
-                <label>Travel Mode <span className="req">*</span></label>
-                <div className="reg-seg">
-                  <button type="button" className={team.travel === 'air' ? 'active' : ''} onClick={() => setT('travel', 'air')}>{icon.plane} Air</button>
-                  <button type="button" className={team.travel === 'road' ? 'active' : ''} onClick={() => setT('travel', 'road')}>{icon.car} Road</button>
-                </div>
-              </div>
-              <div className="reg-field">
-                <label>Accommodation <span className="req">*</span></label>
-                <div className="reg-seg green">
-                  <button type="button" className={team.accommodation === 'yes' ? 'active' : ''} onClick={() => setT('accommodation', 'yes')}>{icon.check} Yes</button>
-                  <button type="button" className={team.accommodation === 'no' ? 'active' : ''} onClick={() => setT('accommodation', 'no')}>{icon.x} No</button>
-                </div>
-              </div>
             </div>
 
             <div className="reg-note">

@@ -26,8 +26,8 @@ export function createTeamRegistration(team) {
       team_captain: team.captain.trim(),
       coach: team.coach.trim(),
       players,
-      travel_mode: titleCase(team.travel),
-      accommodation: team.accommodation === 'yes',
+      travel_mode: 'Not needed',
+      accommodation: false,
     },
   })
 }
