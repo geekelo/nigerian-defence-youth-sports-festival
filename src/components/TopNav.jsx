@@ -43,7 +43,11 @@ function TopNav({ open = false, onToggle, onNavigate }) {
           <img className="ysf-topnav-mark" src={logos.defence} alt={logos.defenceAlt} />
           <img className="ysf-topnav-mark" src={logos.event} alt={logos.eventAlt} />
           <div className="ysf-topnav-brand-text">
-            <span className="ysf-topnav-title">{EVENT.shortName}</span>
+            <span className="ysf-topnav-title">
+              Barracks Youths
+              <br />
+              Sports Championship
+            </span>
             <span className="ysf-topnav-sub">
               {icon.schedule}
               {EVENT.dateRangeShort}
