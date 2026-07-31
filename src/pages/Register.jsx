@@ -103,7 +103,7 @@ function Register() {
     <div className="reg-main">
       <PageHero
         badge={EVENT.dateRangeShort}
-        title="Registration"
+        title="Register your Team"
         subtitle={`Register a barracks team (male or female) for basketball, football or volleyball — ${TOTAL_TEAM_SLOTS} team slots across 8 barracks.`}
       />
 
