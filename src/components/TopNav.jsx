@@ -5,7 +5,7 @@ import { icon } from '../icons.jsx'
 import './TopNav.css'
 
 const NAV = [
-  { label: 'Live Stream', to: '/live', ic: icon.live },
+  // { label: 'Live Stream', to: '/live', ic: icon.live },
   { label: 'Leaderboard', to: '/leaderboard', ic: icon.leaderboard },
   { label: 'Match Fixtures', to: '/match-fixtures', ic: icon.matches },
   { label: 'Schedule', to: '/schedule', ic: icon.schedule },
@@ -40,10 +40,10 @@ function TopNav({ open = false, onToggle, onNavigate }) {
     <header className={`ysf-topnav${open ? ' open' : ''}`}>
       <div className="ysf-topnav-inner">
         <Link
-          to="/register"
+          to="/"
           className="ysf-topnav-brand"
           onClick={onNavigate}
-          aria-label="Go to registration home"
+          aria-label="Go to leaderboard home"
         >
           <img className="ysf-topnav-mark" src={logos.defence} alt={logos.defenceAlt} />
           <img className="ysf-topnav-mark" src={logos.event} alt={logos.eventAlt} />

@@ -24,8 +24,8 @@ function NotFound() {
               or head back to registration.
             </p>
             <div className="not-found-actions">
-              <Link className="reg-btn primary" to="/register">
-                {icon.registration} Go to Register {icon.arrow}
+              <Link className="reg-btn primary" to="/">
+                {icon.leaderboard} Go to Leaderboard {icon.arrow}
               </Link>
               <Link className="reg-btn" to="/match-fixtures">
                 {icon.matches} Match Fixtures
