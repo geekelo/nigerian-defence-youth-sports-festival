@@ -26,9 +26,6 @@ export const GENDERS = [
 export const EVENT_DAYS = [
   { id: 'Day 1', label: 'Day 1 · 3 Aug', date: '3 Aug 2026' },
   { id: 'Day 2', label: 'Day 2 · 4 Aug', date: '4 Aug 2026' },
-  { id: 'Day 3', label: 'Day 3 · 5 Aug', date: '5 Aug 2026' },
-  { id: 'Day 4', label: 'Day 4 · 6 Aug', date: '6 Aug 2026' },
-  { id: 'Day 5', label: 'Day 5 · 7 Aug', date: '7 Aug 2026' },
 ]
 
 /** Default playing surface per sport */

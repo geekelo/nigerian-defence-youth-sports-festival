@@ -38,7 +38,7 @@ function TeamBadge({ code }) {
 
 function MatchFixtures() {
   const [sport, setSport] = useState('all')
-  const [day, setDay] = useState('all')
+  const [day, setDay] = useState('Day 2')
 
   const fixtures = useMemo(
     () =>
@@ -121,7 +121,10 @@ function MatchFixtures() {
             <div key={dayLabel}>
               <div className="fx-day-heading">
                 <h2>{dayLabel}</h2>
-                <span>{rows.length} fixtures · Male &amp; Female</span>
+                <span>
+                  {rows.length} fixtures
+                  {dayLabel.startsWith('Day 2') ? ' · Official LOC schedule' : ''}
+                </span>
               </div>
 
               <div className="fx-grid" style={{ marginTop: 14 }}>
@@ -138,6 +141,11 @@ function MatchFixtures() {
                       <span className={`fx-tag ${f.sport}`}>
                         {sportIcon[f.sport]}
                         {sportName(f.sport)}
+                        {f.gender === 'male'
+                          ? ' · M'
+                          : f.gender === 'female'
+                            ? ' · F'
+                            : ' · M/F'}
                       </span>
                     </div>
 
@@ -155,7 +163,7 @@ function MatchFixtures() {
 
                     <div className="fx-card-foot">
                       {icon.pin}
-                      {f.note || venueForSport(f.sport)}
+                      {[f.note, f.venue || venueForSport(f.sport)].filter(Boolean).join(' · ')}
                     </div>
                   </article>
                 ))}

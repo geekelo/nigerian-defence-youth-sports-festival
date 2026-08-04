@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   RESULTS,
+  PENDING_MATCHES,
   buildStandings,
   teamShort,
   resultSides,
@@ -35,21 +36,33 @@ function collectResults(sportId, genderId) {
 }
 
 function Leaderboard() {
-  const [sport, setSport] = useState('basketball')
-  const [tab, setTab] = useState('overall')
+  const [sport, setSport] = useState('volleyball')
+  const [tab, setTab] = useState('male')
 
   const rows = useMemo(
     () => collectResults(sport, tab),
     [sport, tab],
   )
-  const standings = useMemo(() => buildStandings(rows), [rows])
+  const standings = useMemo(
+    () => buildStandings(rows).filter((row) => row.played > 0),
+    [rows],
+  )
+  const pending = useMemo(
+    () =>
+      PENDING_MATCHES.filter(
+        (m) =>
+          m.sport === sport &&
+          (tab === 'overall' || m.gender === tab),
+      ),
+    [sport, tab],
+  )
 
   return (
     <div className="reg-main">
       <PageHero
         badge={EVENT.dateRangeShort}
         title="Leaderboard"
-        subtitle={`${EVENT.shortName} standings · ${EVENT.dateRangeShort}`}
+        subtitle={`${EVENT.shortName} standings · Day 1 results live`}
       />
 
       <div className="reg-body lb-body">
@@ -102,7 +115,7 @@ function Leaderboard() {
             </div>
           </div>
 
-          {rows.length === 0 ? (
+          {standings.length === 0 ? (
             <p className="regs-empty">
               Results for {sportName(sport)} ({tab}) will appear here once matches are recorded.
             </p>
@@ -156,7 +169,7 @@ function Leaderboard() {
           {rows.length > 0 && (
             <>
               <div className="reg-section-title" style={{ marginTop: 24 }}>
-                RECENT RESULTS
+                Day 1 Results
               </div>
               <div className="fx-results">
                 {rows.map((r) => {
@@ -165,7 +178,10 @@ function Leaderboard() {
                   const winner = resultWinner(r.scores)
                   return (
                     <div className="fx-result" key={resultKey(r, sport, tab)}>
-                      <div className="fx-result-weight">{r.label || sportName(sport)}</div>
+                      <div className="fx-result-weight">
+                        {r.label || sportName(sport)}
+                        {r.note ? ` · ${r.note}` : ''}
+                      </div>
                       <div className="fx-result-score">
                         <span className={`fx-side${winner === sides.left ? ' win' : ''}`}>
                           <span className="fx-code sm">{sides.left}</span>
@@ -182,6 +198,35 @@ function Leaderboard() {
                     </div>
                   )
                 })}
+              </div>
+            </>
+          )}
+
+          {pending.length > 0 && (
+            <>
+              <div className="reg-section-title" style={{ marginTop: 24 }}>
+                Upcoming
+              </div>
+              <div className="fx-results">
+                {pending.map((m) => (
+                  <div className="fx-result" key={`${m.label}-${m.home}-${m.away}`}>
+                    <div className="fx-result-weight">
+                      {m.label}
+                      {m.venue ? ` · ${m.venue}` : ''}
+                    </div>
+                    <div className="fx-result-score">
+                      <span className="fx-side">
+                        <span className="fx-code sm">{m.home}</span>
+                        {teamShort(m.home)}
+                      </span>
+                      <span className="fx-vs-label">vs</span>
+                      <span className="fx-side">
+                        <span className="fx-code sm">{m.away}</span>
+                        {teamShort(m.away)}
+                      </span>
+                    </div>
+                  </div>
+                ))}
               </div>
             </>
           )}
