@@ -5,7 +5,7 @@ import { icon } from '../icons.jsx'
 import './TopNav.css'
 
 const NAV = [
-  // { label: 'Live Stream', to: '/live', ic: icon.live },
+  { label: 'Live Stream', to: '/live', ic: icon.live },
   { label: 'Leaderboard', to: '/leaderboard', ic: icon.leaderboard },
   { label: 'Match Fixtures', to: '/match-fixtures', ic: icon.matches },
   { label: 'Schedule', to: '/schedule', ic: icon.schedule },

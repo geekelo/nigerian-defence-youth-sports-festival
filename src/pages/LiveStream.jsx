@@ -1,37 +1,32 @@
-
 import { EVENT } from '../brand.js'
 import PageHero from '../components/PageHero.jsx'
 import { icon } from '../icons.jsx'
 
-/** Placeholder sessions — replace YouTube IDs when streams go live */
 const SESSIONS = [
   {
-    id: null,
-    title: `${EVENT.shortName.toUpperCase()} · OPENING DAY`,
-    note: 'Stream link will be published closer to the event (3 Aug 2026).',
+    platform: 'x',
+    url: 'https://x.com/i/broadcasts/1AGRnnDVrzjGl',
+    title: 'Female Volleyball · Mogadishu Cantonment',
+    note: 'Day 3 · Live on X (Twitter)',
+    live: true,
   },
   {
-    id: null,
-    title: `${EVENT.shortName.toUpperCase()} · MIDWEEK SESSION`,
-    note: 'Basketball, football and volleyball coverage.',
-  },
-  {
+    platform: 'youtube',
     id: null,
     title: `${EVENT.shortName.toUpperCase()} · FINALS & CLOSING`,
     note: 'Finals and medal presentation · 7 Aug 2026.',
   },
 ]
 
-function sessionEmbed(id) {
+function youtubeEmbed(id) {
   return `https://www.youtube.com/embed/${id}?autoplay=0&rel=0`
 }
 
-function sessionWatch(id) {
+function youtubeWatch(id) {
   return `https://www.youtube.com/live/${id}`
 }
 
 function LiveStream() {
-
   return (
     <div className="reg-main">
       <PageHero
@@ -41,48 +36,74 @@ function LiveStream() {
       />
 
       <div className="reg-body live-body">
-        {SESSIONS.map((session, index) => (
-          <section className="reg-card live-card" key={session.title}>
-            <div className="reg-card-head">
-              <span className="reg-card-icon blue">{icon.live}</span>
-              <div>
-                <h2>{session.title}</h2>
-                <p>
-                  {session.id ? (
-                    <>
-                      Stream on YouTube ·{' '}
-                      <a href={sessionWatch(session.id)} target="_blank" rel="noreferrer">
-                        Open in YouTube
-                      </a>
-                    </>
-                  ) : (
-                    session.note
-                  )}
-                </p>
-              </div>
-            </div>
+        {SESSIONS.map((session, index) => {
+          const isYoutube = session.platform === 'youtube' && session.id
+          const isExternal = Boolean(session.url)
 
-            {session.id ? (
-              <div className="live-player">
-                <iframe
-                  src={sessionEmbed(session.id)}
-                  title={session.title}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                  referrerPolicy="strict-origin-when-cross-origin"
-                />
+          return (
+            <section className="reg-card live-card" key={session.title}>
+              <div className="reg-card-head">
+                <span className="reg-card-icon blue">{icon.live}</span>
+                <div>
+                  <h2>
+                    {session.live ? <span className="live-now-dot" aria-hidden /> : null}
+                    {session.title}
+                  </h2>
+                  <p>
+                    {isYoutube ? (
+                      <>
+                        Stream on YouTube ·{' '}
+                        <a href={youtubeWatch(session.id)} target="_blank" rel="noreferrer">
+                          Open in YouTube
+                        </a>
+                      </>
+                    ) : isExternal ? (
+                      <>
+                        {session.note} ·{' '}
+                        <a href={session.url} target="_blank" rel="noreferrer">
+                          Open on X
+                        </a>
+                      </>
+                    ) : (
+                      session.note
+                    )}
+                  </p>
+                </div>
               </div>
-            ) : (
-              <div className="live-placeholder">
-                <span className="live-placeholder-badge">Coming soon</span>
-                <p>
-                  Session {index + 1} will embed here once the official YouTube
-                  live stream ID is confirmed.
-                </p>
-              </div>
-            )}
-          </section>
-        ))}
+
+              {isYoutube ? (
+                <div className="live-player">
+                  <iframe
+                    src={youtubeEmbed(session.id)}
+                    title={session.title}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                    referrerPolicy="strict-origin-when-cross-origin"
+                  />
+                </div>
+              ) : isExternal ? (
+                <a
+                  className="live-external"
+                  href={session.url}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <span className="live-placeholder-badge live-now-badge">Live now</span>
+                  <p>Female volleyball at Mogadishu Cantonment — tap to watch on X.</p>
+                  <span className="live-external-cta">Watch livestream →</span>
+                </a>
+              ) : (
+                <div className="live-placeholder">
+                  <span className="live-placeholder-badge">Coming soon</span>
+                  <p>
+                    Session {index + 1} will embed here once the official stream
+                    link is confirmed.
+                  </p>
+                </div>
+              )}
+            </section>
+          )
+        })}
       </div>
     </div>
   )

@@ -1231,6 +1231,63 @@
   text-transform: uppercase;
 }
 
+.live-now-badge {
+  background: rgba(220, 50, 50, 0.18);
+  color: #ff7a7a;
+}
+
+.live-now-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background: #e23b3b;
+  vertical-align: middle;
+  box-shadow: 0 0 0 0 rgba(226, 59, 59, 0.55);
+  animation: live-pulse 1.6s ease-out infinite;
+}
+
+@keyframes live-pulse {
+  70% {
+    box-shadow: 0 0 0 8px rgba(226, 59, 59, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(226, 59, 59, 0);
+  }
+}
+
+.live-external {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 36px 22px;
+  border-radius: 12px;
+  border: 1px solid var(--line-strong);
+  background:
+    linear-gradient(135deg, rgba(29, 155, 240, 0.12), transparent 55%),
+    rgba(255, 255, 255, 0.02);
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.55;
+  text-decoration: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.live-external:hover {
+  border-color: rgba(29, 155, 240, 0.45);
+  background:
+    linear-gradient(135deg, rgba(29, 155, 240, 0.18), transparent 55%),
+    rgba(255, 255, 255, 0.03);
+}
+
+.live-external-cta {
+  color: #7ec8ff;
+  font-weight: 700;
+  font-size: 14px;
+}
+
 /* ---------- Countdown ---------- */
 .cd-body {
   display: flex;

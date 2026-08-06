@@ -169,7 +169,7 @@ function Leaderboard() {
           {rows.length > 0 && (
             <>
               <div className="reg-section-title" style={{ marginTop: 24 }}>
-                Day 1 Results
+                Results
               </div>
               <div className="fx-results">
                 {rows.map((r) => {

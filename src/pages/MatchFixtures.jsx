@@ -152,12 +152,16 @@ function MatchFixtures() {
                     <div className="fx-card-body">
                       <div className="fx-team">
                         <TeamBadge code={f.home} />
-                        <span className="fx-team-name">{teamShort(f.home)}</span>
+                        <span className="fx-team-name">
+                          {f.homeLabel || teamShort(f.home)}
+                        </span>
                       </div>
                       <span className="fx-vs">VS</span>
                       <div className="fx-team">
                         <TeamBadge code={f.away} />
-                        <span className="fx-team-name">{teamShort(f.away)}</span>
+                        <span className="fx-team-name">
+                          {f.awayLabel || teamShort(f.away)}
+                        </span>
                       </div>
                     </div>
 
