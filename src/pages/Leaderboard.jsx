@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import {
   RESULTS,
   PENDING_MATCHES,
+  PODIUMS,
   buildStandings,
   teamShort,
   resultSides,
@@ -95,6 +96,16 @@ function Leaderboard() {
     [sport, tab, day],
   )
 
+  const podiums = useMemo(() => {
+    const sportPodiums = PODIUMS[sport] || {}
+    if (tab === 'male' || tab === 'female') {
+      return sportPodiums[tab] ? [{ gender: tab, ...sportPodiums[tab] }] : []
+    }
+    return ['female', 'male']
+      .filter((g) => sportPodiums[g])
+      .map((g) => ({ gender: g, ...sportPodiums[g] }))
+  }, [sport, tab])
+
   const dayLabel =
     day === 'all'
       ? 'All days'
@@ -178,6 +189,41 @@ function Leaderboard() {
               </p>
             </div>
           </div>
+
+          {podiums.length > 0 && (
+            <div className="lb-podiums">
+              {podiums.map((p) => (
+                <div className="lb-podium" key={p.gender}>
+                  <div className="lb-podium-head">
+                    Final podium · {p.gender === 'female' ? 'Female' : 'Male'}
+                  </div>
+                  <ol className="lb-podium-list">
+                    <li className="gold">
+                      <span>1st</span>
+                      <strong>{teamShort(p.first)}</strong>
+                      <span className="fx-code sm">{p.first}</span>
+                    </li>
+                    <li className="silver">
+                      <span>2nd</span>
+                      <strong>{teamShort(p.second)}</strong>
+                      <span className="fx-code sm">{p.second}</span>
+                    </li>
+                    <li className="bronze">
+                      <span>3rd</span>
+                      <strong>{teamShort(p.third)}</strong>
+                      <span className="fx-code sm">{p.third}</span>
+                    </li>
+                  </ol>
+                  {p.mvp ? (
+                    <p className="lb-mvp">
+                      MVP · #{p.mvp.jersey} {p.mvp.name}
+                      {p.mvp.team ? ` · ${teamShort(p.mvp.team)}` : ''}
+                    </p>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          )}
 
           {standings.length === 0 ? (
             <p className="regs-empty">
