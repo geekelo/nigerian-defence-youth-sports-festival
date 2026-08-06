@@ -5,10 +5,19 @@ import { icon } from '../icons.jsx'
 const SESSIONS = [
   {
     platform: 'x',
+    url: 'https://x.com/i/broadcasts/1qGoNNolBLQKv',
+    title: 'Female Basketball · Mogadishu Cantonment',
+    note: 'Day 4 · Live on X (Twitter)',
+    blurb: 'Female basketball at Mogadishu Cantonment — tap to watch on X.',
+    live: true,
+  },
+  {
+    platform: 'x',
     url: 'https://x.com/i/broadcasts/1AGRnnDVrzjGl',
     title: 'Female Volleyball · Mogadishu Cantonment',
-    note: 'Day 3 · Live on X (Twitter)',
-    live: true,
+    note: 'Day 3 · Replay on X',
+    blurb: 'Day 3 female volleyball — open on X.',
+    live: false,
   },
   {
     platform: 'youtube',
@@ -88,9 +97,15 @@ function LiveStream() {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  <span className="live-placeholder-badge live-now-badge">Live now</span>
-                  <p>Female volleyball at Mogadishu Cantonment — tap to watch on X.</p>
-                  <span className="live-external-cta">Watch livestream →</span>
+                  <span
+                    className={`live-placeholder-badge${session.live ? ' live-now-badge' : ''}`}
+                  >
+                    {session.live ? 'Live now' : 'On X'}
+                  </span>
+                  <p>{session.blurb}</p>
+                  <span className="live-external-cta">
+                    {session.live ? 'Watch livestream →' : 'Open on X →'}
+                  </span>
                 </a>
               ) : (
                 <div className="live-placeholder">
