@@ -924,6 +924,14 @@
   gap: 18px;
 }
 
+.lb-day-block {
+  margin-top: 24px;
+}
+
+.lb-day-block .reg-section-title {
+  margin-bottom: 12px;
+}
+
 .lb-rank {
   width: 28px;
   height: 28px;
