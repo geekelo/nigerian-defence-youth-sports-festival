@@ -6,11 +6,10 @@ import {
   buildStandings,
   teamShort,
   resultSides,
-  resultKey,
   resultWinner,
   sportName,
 } from '../data/competition.js'
-import { SPORTS } from '../data/event.js'
+import { EVENT_DAYS, SPORTS } from '../data/event.js'
 import { EVENT } from '../brand.js'
 import PageHero from '../components/PageHero.jsx'
 import { icon, sportIcon } from '../icons.jsx'
@@ -28,45 +27,110 @@ function rankClass(rank) {
   return ''
 }
 
+/** Pull "Day N" from labels like "Day 2 · Game 1" or "Day 4 · Semi-final 1". */
+function dayFromLabel(label = '') {
+  const match = String(label).match(/^Day\s+(\d+)/i)
+  return match ? `Day ${match[1]}` : null
+}
+
+function daySortKey(dayId) {
+  const n = Number(String(dayId).replace(/\D/g, ''))
+  return Number.isFinite(n) ? n : 99
+}
+
 function collectResults(sportId, genderId) {
   const sport = RESULTS[sportId] || { male: [], female: [] }
-  if (genderId === 'male') return sport.male || []
-  if (genderId === 'female') return sport.female || []
-  return [...(sport.male || []), ...(sport.female || [])]
+  if (genderId === 'male') {
+    return (sport.male || []).map((r) => ({ ...r, gender: 'male' }))
+  }
+  if (genderId === 'female') {
+    return (sport.female || []).map((r) => ({ ...r, gender: 'female' }))
+  }
+  return [
+    ...(sport.male || []).map((r) => ({ ...r, gender: 'male' })),
+    ...(sport.female || []).map((r) => ({ ...r, gender: 'female' })),
+  ]
 }
 
 function Leaderboard() {
   const [sport, setSport] = useState('volleyball')
   const [tab, setTab] = useState('male')
+  const [day, setDay] = useState('all')
 
-  const rows = useMemo(
+  const allRows = useMemo(
     () => collectResults(sport, tab),
     [sport, tab],
   )
+
+  const rows = useMemo(() => {
+    if (day === 'all') return allRows
+    return allRows.filter((r) => dayFromLabel(r.label) === day)
+  }, [allRows, day])
+
   const standings = useMemo(
     () => buildStandings(rows).filter((row) => row.played > 0),
     [rows],
   )
+
+  const resultsByDay = useMemo(() => {
+    const map = new Map()
+    for (const r of rows) {
+      const key = dayFromLabel(r.label) || 'Other'
+      if (!map.has(key)) map.set(key, [])
+      map.get(key).push(r)
+    }
+    return [...map.entries()].sort(
+      (a, b) => daySortKey(a[0]) - daySortKey(b[0]),
+    )
+  }, [rows])
+
   const pending = useMemo(
     () =>
       PENDING_MATCHES.filter(
         (m) =>
           m.sport === sport &&
-          (tab === 'overall' || m.gender === tab),
+          (tab === 'overall' || m.gender === tab) &&
+          (day === 'all' || m.day === day),
       ),
-    [sport, tab],
+    [sport, tab, day],
   )
+
+  const dayLabel =
+    day === 'all'
+      ? 'All days'
+      : EVENT_DAYS.find((d) => d.id === day)?.label || day
 
   return (
     <div className="reg-main">
       <PageHero
         badge={EVENT.dateRangeShort}
         title="Leaderboard"
-        subtitle={`${EVENT.shortName} standings · Day 1 results live`}
+        subtitle={`${EVENT.shortName} standings · Days 1–5 results`}
       />
 
       <div className="reg-body lb-body">
         <div className="filter-bar">
+          <div className="pill-group">
+            <button
+              type="button"
+              className={`pill${day === 'all' ? ' active' : ''}`}
+              onClick={() => setDay('all')}
+            >
+              {icon.schedule}
+              All Days
+            </button>
+            {EVENT_DAYS.map((d) => (
+              <button
+                key={d.id}
+                type="button"
+                className={`pill${day === d.id ? ' active' : ''}`}
+                onClick={() => setDay(d.id)}
+              >
+                {d.label}
+              </button>
+            ))}
+          </div>
+
           <div className="pill-group">
             {SPORTS.map((s) => (
               <button
@@ -109,7 +173,7 @@ function Leaderboard() {
                 STANDINGS
               </h2>
               <p>
-                Ranked by points, then goal/point difference ·{' '}
+                {dayLabel} · Ranked by points, then goal/point difference ·{' '}
                 <Link to="/match-fixtures">View fixtures</Link>
               </p>
             </div>
@@ -117,7 +181,8 @@ function Leaderboard() {
 
           {standings.length === 0 ? (
             <p className="regs-empty">
-              Results for {sportName(sport)} ({tab}) will appear here once matches are recorded.
+              No {sportName(sport)} results for {dayLabel.toLowerCase()}
+              {tab !== 'overall' ? ` (${tab})` : ''} yet.
             </p>
           ) : (
             <div className="regs-table-wrap">
@@ -166,39 +231,52 @@ function Leaderboard() {
             </div>
           )}
 
-          {rows.length > 0 && (
+          {resultsByDay.length > 0 && (
             <>
-              <div className="reg-section-title" style={{ marginTop: 24 }}>
-                Results
-              </div>
-              <div className="fx-results">
-                {rows.map((r) => {
-                  const sides = resultSides(r.scores)
-                  if (!sides) return null
-                  const winner = resultWinner(r.scores)
-                  return (
-                    <div className="fx-result" key={resultKey(r, sport, tab)}>
-                      <div className="fx-result-weight">
-                        {r.label || sportName(sport)}
-                        {r.note ? ` · ${r.note}` : ''}
-                      </div>
-                      <div className="fx-result-score">
-                        <span className={`fx-side${winner === sides.left ? ' win' : ''}`}>
-                          <span className="fx-code sm">{sides.left}</span>
-                          {teamShort(sides.left)}
-                          <strong>{sides.leftScore}</strong>
-                        </span>
-                        <span className="fx-vs-label">–</span>
-                        <span className={`fx-side${winner === sides.right ? ' win' : ''}`}>
-                          <span className="fx-code sm">{sides.right}</span>
-                          {teamShort(sides.right)}
-                          <strong>{sides.rightScore}</strong>
-                        </span>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
+              {resultsByDay.map(([dayKey, dayRows]) => (
+                <div key={dayKey} className="lb-day-block">
+                  <div className="reg-section-title">
+                    {dayKey === 'Other'
+                      ? 'Results'
+                      : `${dayKey} · Results`}
+                    {tab === 'overall' ? '' : ` · ${tab === 'female' ? 'Female' : 'Male'}`}
+                  </div>
+                  <div className="fx-results">
+                    {dayRows.map((r, index) => {
+                      const sides = resultSides(r.scores)
+                      if (!sides) return null
+                      const winner = resultWinner(r.scores)
+                      return (
+                        <div
+                          className="fx-result"
+                          key={`${r.gender}-${r.label}-${sides.left}-${sides.right}-${index}`}
+                        >
+                          <div className="fx-result-weight">
+                            {r.label || sportName(sport)}
+                            {tab === 'overall' && r.gender
+                              ? ` · ${r.gender === 'female' ? 'Female' : 'Male'}`
+                              : ''}
+                            {r.note ? ` · ${r.note}` : ''}
+                          </div>
+                          <div className="fx-result-score">
+                            <span className={`fx-side${winner === sides.left ? ' win' : ''}`}>
+                              <span className="fx-code sm">{sides.left}</span>
+                              {teamShort(sides.left)}
+                              <strong>{sides.leftScore}</strong>
+                            </span>
+                            <span className="fx-vs-label">–</span>
+                            <span className={`fx-side${winner === sides.right ? ' win' : ''}`}>
+                              <span className="fx-code sm">{sides.right}</span>
+                              {teamShort(sides.right)}
+                              <strong>{sides.rightScore}</strong>
+                            </span>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              ))}
             </>
           )}
 
