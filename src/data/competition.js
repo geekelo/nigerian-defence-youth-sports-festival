@@ -537,6 +537,16 @@ export const RESULTS = {
       { label: 'Day 2 · Game 4', scores: { NNB: 0, LUN: 2 } },
       { label: 'Day 2 · Game 5', scores: { MOG: 2, MAM: 1 } },
       { label: 'Day 2 · Game 6', scores: { LUN: 2, NVY: 0 } },
+      {
+        label: 'Day 4 · 3rd place',
+        note: 'NN Barracks — 3rd position',
+        scores: { NNB: 2, MAM: 0 },
+      },
+      {
+        label: 'Day 4 · Final',
+        note: 'Mogadishu — 1st · Lungi — 2nd · MVP #15 Mosses (Mogadishu)',
+        scores: { MOG: 3, LUN: 2 },
+      },
     ],
     female: [
       { label: 'Day 1 · Game 1', scores: { MOG: 2, NBC: 0 } },
@@ -557,6 +567,16 @@ export const RESULTS = {
       { label: 'Day 2 · Game 4', scores: { NNB: 0, LUN: 2 } },
       { label: 'Day 2 · Game 5', scores: { MOG: 2, MAM: 1 } },
       { label: 'Day 2 · Game 6', scores: { LUN: 2, NVY: 0 } },
+      {
+        label: 'Day 4 · 3rd place',
+        note: 'NN Barracks — 3rd position',
+        scores: { NNB: 2, AZA: 0 },
+      },
+      {
+        label: 'Day 4 · Final',
+        note: 'Lungi — 1st · Mogadishu — 2nd · MVP #3 Anebi Blessing (Lungi)',
+        scores: { MOG: 0, LUN: 3 },
+      },
     ],
   },
   basketball: {
@@ -638,6 +658,32 @@ export const RESULTS = {
         scores: { MOG: 6, NBC: 4 },
       },
     ],
+  },
+}
+
+/** Final podium + MVP once a category is decided */
+export const PODIUMS = {
+  volleyball: {
+    male: {
+      first: 'MOG',
+      second: 'LUN',
+      third: 'NNB',
+      mvp: { jersey: '15', name: 'Mosses', team: 'MOG' },
+    },
+    female: {
+      first: 'LUN',
+      second: 'MOG',
+      third: 'NNB',
+      mvp: { jersey: '3', name: 'Anebi Blessing', team: 'LUN' },
+    },
+  },
+  football: {
+    female: {
+      first: 'MOG',
+      second: 'NBC',
+      third: 'NVY',
+      mvp: null,
+    },
   },
 }
 
